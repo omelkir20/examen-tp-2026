@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: produits-route
+          uri: lb://produits-service
+          predicates:
+            - Path=/api/produits/**
+
+        - id: categories-route
+          uri: lb://produits-service
+          predicates:
+            - Path=/api/categories/**
+
+        - id: avis-route
+          uri: lb://avis-service
+          predicates:
+            - Path=/api/avis/**
+
+server:
+  port: 8090
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+  instance:
+    hostname: api-gateway
