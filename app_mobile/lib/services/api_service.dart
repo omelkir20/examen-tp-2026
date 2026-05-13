@@ -5,8 +5,7 @@ import '../models/produit.dart';
 import '../models/avis.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://10.0.2.2:8090'; // émulateur Android
-  // Pour appareil physique, remplacez par l'IP de votre machine
+  static const String baseUrl = 'http://localhost:8090';
 
   Future<List<Categorie>> getCategories() async {
     final response = await http.get(Uri.parse('$baseUrl/api/categories'));

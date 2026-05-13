@@ -51,10 +51,11 @@ services:
     ports:
       - "8761:8761"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
-      interval: 30s
+      test: [ "CMD-SHELL", "java -XshowSettings:all -version 2>&1 | grep -q version && (echo > /dev/tcp/localhost/8761) 2>/dev/null || exit 1" ]
+      interval: 15s
       timeout: 10s
-      retries: 5
+      retries: 10
+      start_period: 60s
 
   produits-service:
     build: ./produits-service
@@ -67,9 +68,12 @@ services:
       redis:
         condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-produits:5432/produits_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       SPRING_DATA_REDIS_HOST: redis
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
 
@@ -82,9 +86,12 @@ services:
       postgres-avis:
         condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-avis:5432/avis_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
 
   api-gateway:
@@ -94,7 +101,7 @@ services:
       - "8090:8090"
     depends_on:
       eureka-server:
-        condition: service_healthy
+        condition: service_started
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
 
